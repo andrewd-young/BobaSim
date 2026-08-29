@@ -3,6 +3,8 @@
 local OrderService = require("../src/server/OrderService")
 local CafeSession = require("../src/shared/CafeSession")
 local DrinkRules = require("../src/shared/DrinkRules")
+local Machines = require("../src/shared/Machines")
+local Recipes = require("../src/shared/Recipes")
 local Types = require("../src/shared/Types")
 
 local function assertEqual<T>(actual: T, expected: T, message: string)
@@ -22,6 +24,19 @@ local inProgress = OrderService.markInProgress(order)
 
 assertEqual(inProgress.status, "InProgress", "in-progress status")
 assertEqual(order.status, "Queued", "original order stays immutable")
+
+local machineByStep: { [string]: string } = {}
+for _, machine in Machines do
+    machineByStep[machine.stationStep] = machine.modelName
+end
+
+for _, recipe in Recipes do
+    for _, step in recipe.steps do
+        if machineByStep[step] == nil then
+            error(`recipe step {step} is missing a machine config`)
+        end
+    end
+end
 
 local drink = DrinkRules.createDrink(order.id, order.recipeId)
 

@@ -1,0 +1,16 @@
+{
+  "className": "Model",
+  "properties": {
+    "Attributes": {
+      "DisplayName": {
+        "String": "Ice Bin"
+      },
+      "InteractionRange": {
+        "Float64": 8
+      },
+      "StationStep": {
+        "String": "Ice"
+      }
+    }
+  }
+}

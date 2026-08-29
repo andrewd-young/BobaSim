@@ -1,0 +1,16 @@
+{
+  "className": "Model",
+  "properties": {
+    "Attributes": {
+      "DisplayName": {
+        "String": "Boba Dispenser"
+      },
+      "InteractionRange": {
+        "Float64": 8
+      },
+      "StationStep": {
+        "String": "Boba"
+      }
+    }
+  }
+}

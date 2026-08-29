@@ -24,6 +24,7 @@ export type MachineDefinition = {
     id: string,
     displayName: string,
     modelName: string,
+    stationStep: StationStep,
     machineType: string,
     interactionRange: number,
     inputType: string?,

@@ -1,0 +1,16 @@
+{
+  "className": "Model",
+  "properties": {
+    "Attributes": {
+      "DisplayName": {
+        "String": "Cup Sealer"
+      },
+      "InteractionRange": {
+        "Float64": 8
+      },
+      "StationStep": {
+        "String": "Seal"
+      }
+    }
+  }
+}

@@ -26,13 +26,13 @@ Success means a new player can join, make a correct starter drink, serve it, ear
 - [ ] Roblox Studio opens the built place successfully.
 - [ ] Rojo sync works from filesystem changes into Studio.
 - [x] Studio MCP is connected and can inspect or modify the DataModel. Verified read-only inspection against the open `BobaSim` Studio instance.
-- [x] One simple Part-based machine exists in Studio with stable names/attributes. Rojo-managed `CupStation` blockout lives under `assets/stations` and mounts into `Workspace.BobaSimStations`.
-- [x] One machine interaction can be tested in Studio. `CupStation` exposes a ProximityPrompt wired to the authoritative step flow.
+- [x] Initial Part-based stations exist with stable names/attributes. Rojo-managed blockouts for cup, boba, tea, milk, flavor, ice, shaker, sealer, and serve counter live under `assets/stations` and mount into `Workspace.BobaSimStations`.
+- [x] Station interactions share one server binding pattern. Each station model exposes a `StationStep` attribute and a `StationPrompt` ProximityPrompt wired to the authoritative step flow.
 
 ## Phase 1: Drink-Making Vertical Slice
 
 - [x] Define the authoritative cup/drink state model. Initial pure rules live in `src/shared/DrinkRules.luau` for server use and local tests.
-- [x] Implement server-side step application for cup, boba, tea, milk, flavor, ice, shake, seal, and serve. The server will call the shared rule module when Studio interactions are wired.
+- [x] Implement server-side step application for cup, boba, tea, milk, flavor, ice, shake, seal, and serve. Station prompts call the shared rule module through the server-owned session flow.
 - [x] Validate station interactions on the server. Initial validation rejects wrong, duplicate, or post-completion steps.
 - [x] Validate completed drinks against recipe definitions.
 - [x] Add tests for correct drink completion.

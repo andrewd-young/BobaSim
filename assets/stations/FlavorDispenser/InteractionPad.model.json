@@ -1,0 +1,28 @@
+{
+  "ClassName": "Part",
+  "Properties": {
+    "Anchored": true,
+    "BottomSurface": "Smooth",
+    "Color": [0.882353, 0.247059, 0.384314],
+    "CFrame": [28, 3.1, -7.8, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    "Material": "Neon",
+    "Size": [2, 0.18, 1.4],
+    "TopSurface": "Smooth"
+  },
+  "Children": [
+    {
+      "Name": "StationPrompt",
+      "ClassName": "ProximityPrompt",
+      "Properties": {
+        "ActionText": "Pump Flavor",
+        "ClickablePrompt": true,
+        "GamepadKeyCode": "ButtonX",
+        "HoldDuration": 0,
+        "KeyboardKeyCode": "E",
+        "MaxActivationDistance": 8,
+        "ObjectText": "Flavor Dispenser",
+        "RequiresLineOfSight": false
+      }
+    }
+  ]
+}
