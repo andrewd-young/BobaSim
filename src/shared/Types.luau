@@ -41,6 +41,29 @@ export type Order = {
     status: OrderStatus,
 }
 
+export type DrinkStatus = "Building" | "Sealed" | "Served" | "Rejected"
+
+export type Drink = {
+    id: string,
+    orderId: string,
+    recipeId: string,
+    completedSteps: { StationStep },
+    status: DrinkStatus,
+}
+
+export type StepApplication = {
+    accepted: boolean,
+    drink: Drink,
+    reason: string?,
+}
+
+export type ServeResult = {
+    accepted: boolean,
+    drink: Drink,
+    payout: number,
+    reason: string?,
+}
+
 local Types = {}
 
 return Types

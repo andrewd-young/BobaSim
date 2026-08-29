@@ -1,8 +1,17 @@
 --!strict
 
-local Types = require(script.Parent.Types)
+type MachineDefinition = {
+    id: string,
+    displayName: string,
+    modelName: string,
+    machineType: string,
+    interactionRange: number,
+    inputType: string?,
+    outputType: string?,
+    animationNames: { string },
+}
 
-local machines: { Types.MachineDefinition } = {
+local machines: { MachineDefinition } = {
     {
         id = "boba_dispenser",
         displayName = "Boba Dispenser",

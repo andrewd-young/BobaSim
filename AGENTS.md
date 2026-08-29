@@ -6,6 +6,24 @@ BobaSim is a cooperative, hands-on Roblox boba cafe simulator. Favor physical ac
 visible workflow problems, rush pressure, and cafe ownership over bookkeeping-heavy
 restaurant management.
 
+## Design Principles
+
+1. Play within 10 seconds. Never make a player read before having fun.
+2. Every action reacts. Use sound, motion, visual state, and UI feedback.
+3. Physical before abstract. Show pearls falling rather than `+1 Boba`.
+4. Readable before realistic. Exaggerate shapes, colors, and proportions.
+5. Mobile first. Every core interaction works beautifully with one thumb.
+6. Roblox avatars belong in the world. Keep the player's identity visible.
+7. Friends make the game better. Multiplayer changes the experience rather than merely duplicating it.
+8. Complexity unlocks gradually. The first drink is trivial; a 30-minute cafe shift can become chaos.
+9. Upgrades change behavior. A better machine should feel different, not just provide `+15%`.
+10. Reuse everything. Prefer modular models, shared textures, configurable recipes, and reusable components.
+11. Server owns truth. Clients request; the server validates.
+12. Client owns feel. Animation, VFX, UI, sound, and immediate feedback happen locally where appropriate.
+13. Data drives content. Recipes, equipment, ingredients, and upgrades should primarily be configuration, not duplicated code.
+14. Measure behavior. Instrument onboarding and progression from the beginning.
+15. Prove fun before producing content. One amazing drink is worth more than 40 boring recipes.
+
 ## Development Rules
 
 1. The server owns authoritative gameplay state.
@@ -49,4 +67,3 @@ and advanced management until the drink-making interaction feels good.
 Use Studio MCP when the task needs real DataModel inspection, instance creation,
 playtesting, physics, animation, or UI verification. Filesystem-only checks are not enough
 for behavior that depends on Studio-owned objects.
-
