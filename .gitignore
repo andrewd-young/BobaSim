@@ -1,0 +1,14 @@
+.DS_Store
+
+# Roblox/Rojo generated output
+build/
+sourcemap.json
+
+# Wally packages are reproducible from wally.toml/wally.lock
+Packages/
+ServerPackages/
+
+# Temporary files
+*.tmp
+*.log
+
