@@ -19,9 +19,17 @@ jobs:
           curl -sSf https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh | bash
           echo "$HOME/.rokit/bin" >> "$GITHUB_PATH"
 
+      - name: Trust tools
+        run: |
+          rokit trust rojo-rbx/rojo
+          rokit trust JohnnyMorganz/StyLua
+          rokit trust Kampfkarren/selene
+          rokit trust lune-org/lune
+          rokit trust UpliftGames/wally
+          rokit trust JohnnyMorganz/luau-lsp
+
       - name: Install tools
         run: rokit install
 
       - name: Run checks
         run: make check
-
