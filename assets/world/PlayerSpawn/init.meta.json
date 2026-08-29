@@ -3,14 +3,14 @@
   "properties": {
     "Anchored": true,
     "BottomSurface": "Smooth",
-    "CanCollide": true,
-    "Color": [0.180392, 0.517647, 0.415686],
-    "CFrame": [-8, 1.1, 8, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    "CanCollide": false,
+    "Color": [0.627451, 0.537255, 0.419608],
+    "CFrame": [-10, 0.7, 11, 1, 0, 0, 0, 1, 0, 0, 0, 1],
     "Duration": 0,
-    "Material": "Neon",
+    "Material": "SmoothPlastic",
     "Neutral": true,
-    "Size": [5, 0.2, 5],
+    "Size": [4, 0.2, 4],
     "TopSurface": "Smooth",
-    "Transparency": 0.25
+    "Transparency": 1
   }
 }
