@@ -1,0 +1,70 @@
+{
+  "ClassName": "Part",
+  "Properties": {
+    "Anchored": true,
+    "BottomSurface": "Smooth",
+    "Color": [0.176471, 0.160784, 0.141176],
+    "CFrame": [0, 4.1, -9.35, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    "Material": "SmoothPlastic",
+    "Size": [4.4, 1.4, 0.2],
+    "TopSurface": "Smooth"
+  },
+  "Children": [
+    {
+      "Name": "FrontStationLabel",
+      "ClassName": "SurfaceGui",
+      "Properties": {
+        "Face": "Front",
+        "PixelsPerStud": 48,
+        "SizingMode": "PixelsPerStud"
+      },
+      "Children": [
+        {
+          "Name": "Text",
+          "ClassName": "TextLabel",
+          "Properties": {
+            "BackgroundTransparency": 1,
+            "Font": "GothamBold",
+            "Size": {
+              "UDim2": [
+                [1, 0],
+                [1, 0]
+              ]
+            },
+            "Text": "CUP",
+            "TextColor3": [1, 0.956863, 0.882353],
+            "TextScaled": true
+          }
+        }
+      ]
+    },
+    {
+      "Name": "BackStationLabel",
+      "ClassName": "SurfaceGui",
+      "Properties": {
+        "Face": "Back",
+        "PixelsPerStud": 48,
+        "SizingMode": "PixelsPerStud"
+      },
+      "Children": [
+        {
+          "Name": "Text",
+          "ClassName": "TextLabel",
+          "Properties": {
+            "BackgroundTransparency": 1,
+            "Font": "GothamBold",
+            "Size": {
+              "UDim2": [
+                [1, 0],
+                [1, 0]
+              ]
+            },
+            "Text": "CUP",
+            "TextColor3": [1, 0.956863, 0.882353],
+            "TextScaled": true
+          }
+        }
+      ]
+    }
+  ]
+}

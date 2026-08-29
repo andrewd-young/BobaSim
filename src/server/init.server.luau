@@ -76,7 +76,7 @@ requestStepRemote.OnServerInvoke = function(player: Player, step: unknown): Cafe
     return applyPlayerStep(player, step :: any)
 end
 
-StationWorld.ensureCupStation(function(player: Player, step: CafeSession.StationStep)
+StationWorld.bindStations(function(player: Player, step: CafeSession.StationStep)
     return applyPlayerStep(player, step)
 end)
 

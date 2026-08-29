@@ -1,0 +1,16 @@
+{
+  "className": "Model",
+  "properties": {
+    "Attributes": {
+      "DisplayName": {
+        "String": "Cup Station"
+      },
+      "InteractionRange": {
+        "Float64": 8
+      },
+      "StationStep": {
+        "String": "Cup"
+      }
+    }
+  }
+}

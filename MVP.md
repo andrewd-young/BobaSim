@@ -26,7 +26,7 @@ Success means a new player can join, make a correct starter drink, serve it, ear
 - [ ] Roblox Studio opens the built place successfully.
 - [ ] Rojo sync works from filesystem changes into Studio.
 - [x] Studio MCP is connected and can inspect or modify the DataModel. Verified read-only inspection against the open `BobaSim` Studio instance.
-- [x] One simple Part-based machine exists in Studio with stable names/attributes. Runtime `CupStation` blockout verified in Play mode through Studio MCP.
+- [x] One simple Part-based machine exists in Studio with stable names/attributes. Rojo-managed `CupStation` blockout lives under `assets/stations` and mounts into `Workspace.BobaSimStations`.
 - [x] One machine interaction can be tested in Studio. `CupStation` exposes a ProximityPrompt wired to the authoritative step flow.
 
 ## Phase 1: Drink-Making Vertical Slice
