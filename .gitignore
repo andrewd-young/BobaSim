@@ -3,6 +3,7 @@
 # Roblox/Rojo generated output
 build/
 sourcemap.json
+*.rbxl.lock
 
 # Wally packages are reproducible from wally.toml/wally.lock
 Packages/
@@ -11,4 +12,3 @@ ServerPackages/
 # Temporary files
 *.tmp
 *.log
-
