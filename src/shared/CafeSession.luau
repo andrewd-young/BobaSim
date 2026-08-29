@@ -40,6 +40,8 @@ export type StepResult = {
     reason: string?,
 }
 
+export type StationStep = Types.StationStep
+
 local DEFAULT_PATIENCE_SECONDS = 60
 
 local CafeSession = {}

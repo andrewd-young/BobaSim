@@ -2,7 +2,6 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
 
 type Snapshot = {
     recipeName: string,
@@ -14,33 +13,14 @@ type Snapshot = {
     lastMessage: string,
 }
 
-type StepResult = {
-    accepted: boolean,
-    snapshot: Snapshot,
-    reason: string?,
-}
-
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 local remotesFolder = ReplicatedStorage:WaitForChild("BobaSimRemotes")
 local getStateRemote = remotesFolder:WaitForChild("GetState") :: RemoteFunction
-local requestStepRemote = remotesFolder:WaitForChild("RequestStep") :: RemoteFunction
+local stateChangedRemote = remotesFolder:WaitForChild("StateChanged") :: RemoteEvent
 
-local stationSteps: { string } = {
-    "Cup",
-    "Boba",
-    "Flavor",
-    "Tea",
-    "Milk",
-    "Ice",
-    "Shake",
-    "Seal",
-    "Serve",
-}
-
-local buttonByStep: { [string]: TextButton } = {}
-local busy = false
+local checklistLabels: { TextLabel } = {}
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "BobaSimHud"
@@ -49,11 +29,11 @@ gui.Parent = playerGui
 
 local root = Instance.new("Frame")
 root.Name = "Root"
-root.AnchorPoint = Vector2.new(0.5, 1)
-root.Position = UDim2.fromScale(0.5, 0.98)
-root.Size = UDim2.fromScale(0.94, 0.42)
+root.AnchorPoint = Vector2.new(1, 0)
+root.Position = UDim2.new(1, -14, 0, 14)
+root.Size = UDim2.fromOffset(230, 224)
 root.BackgroundColor3 = Color3.fromRGB(29, 27, 24)
-root.BackgroundTransparency = 0.08
+root.BackgroundTransparency = 0.18
 root.BorderSizePixel = 0
 root.Parent = gui
 
@@ -65,19 +45,19 @@ local rootPadding = Instance.new("UIPadding")
 rootPadding.PaddingBottom = UDim.new(0, 12)
 rootPadding.PaddingLeft = UDim.new(0, 12)
 rootPadding.PaddingRight = UDim.new(0, 12)
-rootPadding.PaddingTop = UDim.new(0, 12)
+rootPadding.PaddingTop = UDim.new(0, 8)
 rootPadding.Parent = root
 
 local layout = Instance.new("UIListLayout")
 layout.FillDirection = Enum.FillDirection.Vertical
-layout.Padding = UDim.new(0, 8)
+layout.Padding = UDim.new(0, 5)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 layout.Parent = root
 
 local ticket = Instance.new("TextLabel")
 ticket.Name = "Ticket"
 ticket.LayoutOrder = 1
-ticket.Size = UDim2.new(1, 0, 0, 42)
+ticket.Size = UDim2.new(1, 0, 0, 24)
 ticket.BackgroundTransparency = 1
 ticket.Font = Enum.Font.GothamBold
 ticket.TextColor3 = Color3.fromRGB(255, 244, 225)
@@ -86,14 +66,14 @@ ticket.TextXAlignment = Enum.TextXAlignment.Left
 ticket.Parent = root
 
 local ticketTextSize = Instance.new("UITextSizeConstraint")
-ticketTextSize.MaxTextSize = 28
-ticketTextSize.MinTextSize = 14
+ticketTextSize.MaxTextSize = 18
+ticketTextSize.MinTextSize = 10
 ticketTextSize.Parent = ticket
 
 local progress = Instance.new("TextLabel")
 progress.Name = "Progress"
 progress.LayoutOrder = 2
-progress.Size = UDim2.new(1, 0, 0, 28)
+progress.Size = UDim2.new(1, 0, 0, 18)
 progress.BackgroundTransparency = 1
 progress.Font = Enum.Font.GothamMedium
 progress.TextColor3 = Color3.fromRGB(205, 232, 218)
@@ -102,144 +82,94 @@ progress.TextXAlignment = Enum.TextXAlignment.Left
 progress.Parent = root
 
 local progressTextSize = Instance.new("UITextSizeConstraint")
-progressTextSize.MaxTextSize = 18
+progressTextSize.MaxTextSize = 14
 progressTextSize.MinTextSize = 10
 progressTextSize.Parent = progress
 
+local checklist = Instance.new("Frame")
+checklist.Name = "Checklist"
+checklist.LayoutOrder = 3
+checklist.Size = UDim2.new(1, 0, 0, 116)
+checklist.BackgroundTransparency = 1
+checklist.Parent = root
+
+local checklistLayout = Instance.new("UIListLayout")
+checklistLayout.FillDirection = Enum.FillDirection.Vertical
+checklistLayout.Padding = UDim.new(0, 1)
+checklistLayout.SortOrder = Enum.SortOrder.LayoutOrder
+checklistLayout.Parent = checklist
+
 local feedback = Instance.new("TextLabel")
 feedback.Name = "Feedback"
-feedback.LayoutOrder = 3
+feedback.LayoutOrder = 4
 feedback.Size = UDim2.new(1, 0, 0, 28)
 feedback.BackgroundTransparency = 1
-feedback.Font = Enum.Font.GothamBold
+feedback.Font = Enum.Font.GothamMedium
 feedback.TextColor3 = Color3.fromRGB(255, 211, 128)
 feedback.TextScaled = true
+feedback.TextWrapped = true
 feedback.TextXAlignment = Enum.TextXAlignment.Left
 feedback.Parent = root
 
 local feedbackTextSize = Instance.new("UITextSizeConstraint")
-feedbackTextSize.MaxTextSize = 20
-feedbackTextSize.MinTextSize = 10
+feedbackTextSize.MaxTextSize = 13
+feedbackTextSize.MinTextSize = 9
 feedbackTextSize.Parent = feedback
 
-local stationGrid = Instance.new("Frame")
-stationGrid.Name = "Stations"
-stationGrid.LayoutOrder = 4
-stationGrid.Size = UDim2.new(1, 0, 1, -122)
-stationGrid.BackgroundTransparency = 1
-stationGrid.Parent = root
-
-local grid = Instance.new("UIGridLayout")
-grid.CellPadding = UDim2.fromOffset(8, 8)
-grid.CellSize = UDim2.new(0.333, -8, 0.333, -8)
-grid.FillDirectionMaxCells = 3
-grid.SortOrder = Enum.SortOrder.LayoutOrder
-grid.Parent = stationGrid
-
-local function completedStepText(snapshot: Snapshot): string
-    if #snapshot.completedSteps == 0 then
-        return "No steps yet"
+local function hasCompletedStep(snapshot: Snapshot, step: string): boolean
+    for _, completedStep in snapshot.completedSteps do
+        if completedStep == step then
+            return true
+        end
     end
 
-    return table.concat(snapshot.completedSteps, " > ")
+    return false
 end
 
-local function flashButton(button: TextButton, color: Color3)
-    local originalColor = button.BackgroundColor3
-    button.BackgroundColor3 = color
+local function ensureChecklistRows(snapshot: Snapshot)
+    while #checklistLabels < #snapshot.requiredSteps do
+        local row = Instance.new("TextLabel")
+        row.Name = `Step{#checklistLabels + 1}`
+        row.LayoutOrder = #checklistLabels + 1
+        row.Size = UDim2.new(1, 0, 0, 12)
+        row.BackgroundTransparency = 1
+        row.Font = Enum.Font.GothamMedium
+        row.TextScaled = true
+        row.TextXAlignment = Enum.TextXAlignment.Left
+        row.Parent = checklist
 
-    local tween = TweenService:Create(
-        button,
-        TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-        { BackgroundColor3 = originalColor }
-    )
-    tween:Play()
-end
+        local textSize = Instance.new("UITextSizeConstraint")
+        textSize.MaxTextSize = 12
+        textSize.MinTextSize = 8
+        textSize.Parent = row
 
-local function setButtonsEnabled(enabled: boolean)
-    for _, button in buttonByStep do
-        button.Active = enabled
-        button.AutoButtonColor = enabled
-        button.TextTransparency = if enabled then 0 else 0.35
+        table.insert(checklistLabels, row)
+    end
+
+    for index = #snapshot.requiredSteps + 1, #checklistLabels do
+        checklistLabels[index].Visible = false
     end
 end
 
 local function render(snapshot: Snapshot)
     ticket.Text = `{snapshot.recipeName}  ${snapshot.money}`
-    progress.Text = `Next: {snapshot.nextStep or "New order"} | {completedStepText(snapshot)}`
+    progress.Text = `Next: {snapshot.nextStep or "New order"}`
     feedback.Text = snapshot.lastMessage
 
-    for index = 1, #stationSteps do
-        local step = stationSteps[index]
-        local button = buttonByStep[step]
+    ensureChecklistRows(snapshot)
+
+    for index, step in snapshot.requiredSteps do
+        local row = checklistLabels[index]
+        local isDone = hasCompletedStep(snapshot, step)
         local isNext = snapshot.nextStep == step
 
-        button.BackgroundColor3 = if isNext
-            then Color3.fromRGB(49, 132, 96)
-            else Color3.fromRGB(63, 58, 51)
-        button.TextColor3 = if isNext
-            then Color3.fromRGB(255, 255, 245)
-            else Color3.fromRGB(228, 219, 205)
+        row.Visible = true
+        row.Text = `{if isDone then "[x]" elseif isNext then ">" else "-"} {step}`
+        row.TextColor3 = if isDone
+            then Color3.fromRGB(148, 210, 168)
+            elseif isNext then Color3.fromRGB(255, 244, 225)
+            else Color3.fromRGB(177, 166, 151)
     end
-end
-
-local function requestStep(step: string)
-    if busy then
-        return
-    end
-
-    busy = true
-    setButtonsEnabled(false)
-
-    local success, response = pcall(function()
-        return requestStepRemote:InvokeServer(step)
-    end)
-
-    setButtonsEnabled(true)
-    busy = false
-
-    local button = buttonByStep[step]
-    if not success then
-        feedback.Text = "Could not reach the cafe server."
-        flashButton(button, Color3.fromRGB(158, 62, 62))
-        return
-    end
-
-    local result = response :: StepResult
-    render(result.snapshot)
-    flashButton(
-        button,
-        if result.accepted then Color3.fromRGB(92, 190, 133) else Color3.fromRGB(180, 72, 72)
-    )
-end
-
-for index = 1, #stationSteps do
-    local step = stationSteps[index]
-    local button = Instance.new("TextButton")
-    button.Name = `{step}Button`
-    button.LayoutOrder = index
-    button.BackgroundColor3 = Color3.fromRGB(63, 58, 51)
-    button.BorderSizePixel = 0
-    button.Font = Enum.Font.GothamBold
-    button.Text = step
-    button.TextColor3 = Color3.fromRGB(228, 219, 205)
-    button.TextScaled = true
-    button.Parent = stationGrid
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
-    corner.Parent = button
-
-    local textSize = Instance.new("UITextSizeConstraint")
-    textSize.MaxTextSize = 22
-    textSize.MinTextSize = 10
-    textSize.Parent = button
-
-    button.Activated:Connect(function()
-        requestStep(step)
-    end)
-
-    buttonByStep[step] = button
 end
 
 local success, snapshot = pcall(function()
@@ -249,7 +179,13 @@ end)
 if success then
     render(snapshot :: Snapshot)
 else
-    feedback.Text = "Waiting for the cafe server..."
+    ticket.Text = "BobaSim"
+    progress.Text = "Waiting for cafe server"
+    feedback.Text = ""
 end
+
+stateChangedRemote.OnClientEvent:Connect(function(updatedSnapshot: Snapshot)
+    render(updatedSnapshot)
+end)
 
 print("BobaSim client ready. Touch station buttons to make drinks.")
