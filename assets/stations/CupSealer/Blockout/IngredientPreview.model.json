@@ -4,18 +4,18 @@
     "Anchored": true,
     "BottomSurface": "Smooth",
     "CFrame": [
-      12,
+      15,
       3.85,
-      4,
       1,
       0,
       0,
+      1,
       0,
       1,
       0,
+      -1,
       0,
-      0,
-      1
+      0
     ],
     "Color": [
       0.737255,

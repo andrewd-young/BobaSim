@@ -5,7 +5,7 @@
     "BottomSurface": "Smooth",
     "CanCollide": false,
     "Color": [0.247059, 0.458824, 0.47451],
-    "CFrame": [-10, 0.56, 11, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    "CFrame": [-15, 0.56, 10.5, 1, 0, 0, 0, 1, 0, 0, 0, 1],
     "Material": "Fabric",
     "Size": [5, 0.12, 3],
     "TopSurface": "Smooth"

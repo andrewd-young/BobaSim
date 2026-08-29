@@ -101,6 +101,16 @@ Success means a new player can join, make a correct starter drink, serve it, ear
 - First upgrade should physically change workflow or bottleneck behavior.
 - Recipes and machines stay in shared config modules.
 
+## Layout Review Notes
+
+- The first blockout read as loose props instead of a cafe workflow: the ingredient stations mostly sat on one back counter, but ice, shake, seal, and serve broke away without a clear reason.
+- Serve was isolated in the room center, so the final handoff did not feel connected to either the customer side or the last machine.
+- The entrance mat and service mat did not point players toward the useful first and last actions.
+- The station sequence needed to reinforce the recipe order at a glance: cup, ingredients, ice, shake, seal, serve.
+- The first clockwise pass still had side-run stations facing like back-counter stations, which made shake and seal read as rotated placement without rotated equipment.
+- The walls described a leftover rectangular floor more than the actual cafe footprint, and the right-side finishing run had no wall or boundary to anchor it.
+- The MVP fix keeps primitive models but arranges them into a clockwise line: prep along the back wall, finishing on a rotated right return, and service near the front customer mat.
+
 ## Completion Notes
 
 When marking work complete, include the PR, commit, or short note beside the checkbox when helpful. If a task is discovered to be unnecessary, replace the checkbox with a short decision note instead of silently deleting it.

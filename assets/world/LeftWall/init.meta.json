@@ -4,9 +4,9 @@
     "Anchored": true,
     "BottomSurface": "Smooth",
     "Color": [0.882353, 0.807843, 0.658824],
-    "CFrame": [-22.25, 3, -3, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    "CFrame": [-22.25, 3, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
     "Material": "SmoothPlastic",
-    "Size": [0.5, 6, 34],
+    "Size": [0.5, 6, 28],
     "TopSurface": "Smooth"
   }
 }
