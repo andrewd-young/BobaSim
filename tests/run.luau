@@ -1,6 +1,7 @@
 --!strict
 
 local OrderService = require("../src/server/OrderService")
+local CafeSession = require("../src/shared/CafeSession")
 local DrinkRules = require("../src/shared/DrinkRules")
 local Types = require("../src/shared/Types")
 
@@ -99,5 +100,40 @@ strawberryCurrent =
 local strawberryServed = DrinkRules.serveDrink(strawberryCurrent)
 assertEqual(strawberryServed.accepted, true, "strawberry drink accepted")
 assertEqual(strawberryServed.payout, 9, "strawberry payout")
+
+local session = CafeSession.create(100)
+local firstSnapshot = CafeSession.snapshot(session)
+
+assertEqual(firstSnapshot.recipeName, "Classic Milk Tea", "first session recipe")
+assertEqual(firstSnapshot.money, 0, "new session money")
+assertEqual(firstSnapshot.nextStep, "Cup", "session starts at cup")
+
+local badSessionStep = CafeSession.applyStep(session, "Tea", 101)
+assertEqual(badSessionStep.accepted, false, "session rejects wrong first station")
+assertEqual(badSessionStep.snapshot.nextStep, "Cup", "wrong station keeps next step")
+assertEqual(badSessionStep.snapshot.money, 0, "wrong station does not pay")
+
+local function applySessionStep(step: Types.StationStep)
+    local result = CafeSession.applyStep(session, step, 102)
+    assertEqual(result.accepted, true, `{step} accepted in session`)
+    return result.snapshot
+end
+
+applySessionStep("Cup")
+applySessionStep("Boba")
+applySessionStep("Tea")
+applySessionStep("Milk")
+applySessionStep("Ice")
+applySessionStep("Shake")
+applySessionStep("Seal")
+local servedSnapshot = applySessionStep("Serve")
+
+assertEqual(servedSnapshot.money, 8, "session pays classic recipe")
+assertEqual(servedSnapshot.status, "Served", "session drink is served")
+
+local newOrderSnapshot = applySessionStep("Cup")
+assertEqual(newOrderSnapshot.recipeName, "Strawberry Milk Tea", "served session advances recipe")
+assertEqual(newOrderSnapshot.nextStep, "Boba", "new recipe has advanced after cup")
+assertEqual(newOrderSnapshot.money, 8, "new order keeps earned money")
 
 print("All tests passed.")

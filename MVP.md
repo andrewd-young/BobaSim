@@ -39,8 +39,8 @@ Success means a new player can join, make a correct starter drink, serve it, ear
 - [x] Add tests for missing, duplicate, or out-of-order steps.
 - [x] Add a basic money reward for a correctly served drink.
 - [x] Add a basic rejection or remake result for an incorrect drink.
-- [ ] Create minimal client feedback for each successful action.
-- [ ] Create minimal client feedback for invalid actions.
+- [x] Create minimal client feedback for each successful action. Initial HUD station loop flashes accepted steps and updates order progress.
+- [x] Create minimal client feedback for invalid actions. Initial HUD station loop flashes rejected steps and shows the server rejection reason.
 - [ ] Playtest one complete order in Studio.
 
 ## Phase 2: Customer Pressure
