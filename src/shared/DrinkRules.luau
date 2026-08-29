@@ -1,40 +1,14 @@
 --!strict
 
-local Recipes = if script ~= nil then require(script.Parent.Recipes) else require("./Recipes")
+local Types = require("./Types")
+local Recipes = require("./Recipes")
 
-type StationStep = "Cup" | "Boba" | "Tea" | "Milk" | "Flavor" | "Ice" | "Shake" | "Seal" | "Serve"
-
-type RecipeDefinition = {
-    id: string,
-    displayName: string,
-    unlockLevel: number,
-    baseValue: number,
-    steps: { StationStep },
-    ingredients: { string },
-}
-
-type DrinkStatus = "Building" | "Sealed" | "Served" | "Rejected"
-
-type Drink = {
-    id: string,
-    orderId: string,
-    recipeId: string,
-    completedSteps: { StationStep },
-    status: DrinkStatus,
-}
-
-type StepApplication = {
-    accepted: boolean,
-    drink: Drink,
-    reason: string?,
-}
-
-type ServeResult = {
-    accepted: boolean,
-    drink: Drink,
-    payout: number,
-    reason: string?,
-}
+type StationStep = Types.StationStep
+type RecipeDefinition = Types.RecipeDefinition
+type DrinkStatus = Types.DrinkStatus
+type Drink = Types.Drink
+type StepApplication = Types.StepApplication
+type ServeResult = Types.ServeResult
 
 local DrinkRules = {}
 

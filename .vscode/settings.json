@@ -4,5 +4,6 @@
   "luau-lsp.sourcemap.rojoProjectFile": "default.project.json",
   "luau-lsp.sourcemap.sourcemapFile": "sourcemap.json",
   "luau-lsp.require.mode": "relativeToFile",
+  "luau-lsp.completion.imports.stringRequires.enabled": true,
   "stylua.targetReleaseVersion": "latest"
 }

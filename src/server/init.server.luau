@@ -1,6 +1,6 @@
 --!strict
 
-local OrderService = require(script.OrderService)
+local OrderService = require("@self/OrderService")
 
 local previewOrder = OrderService.createOrder("classic_milk_tea")
 

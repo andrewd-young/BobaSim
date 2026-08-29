@@ -1,17 +1,8 @@
 --!strict
 
-type StationStep = "Cup" | "Boba" | "Tea" | "Milk" | "Flavor" | "Ice" | "Shake" | "Seal" | "Serve"
+local Types = require("./Types")
 
-type RecipeDefinition = {
-    id: string,
-    displayName: string,
-    unlockLevel: number,
-    baseValue: number,
-    steps: { StationStep },
-    ingredients: { string },
-}
-
-local recipes: { RecipeDefinition } = {
+local recipes: { Types.RecipeDefinition } = {
     {
         id = "classic_milk_tea",
         displayName = "Classic Milk Tea",

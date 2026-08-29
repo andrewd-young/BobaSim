@@ -11,7 +11,7 @@ sourcemap:
 	rojo sourcemap default.project.json --output sourcemap.json
 
 typecheck: sourcemap
-	luau-lsp analyze --platform roblox --sourcemap sourcemap.json --definitions=types/globalTypes.d.luau src tests
+	luau-lsp analyze --platform roblox --settings .vscode/settings.json --sourcemap sourcemap.json --definitions=types/globalTypes.d.luau src tests
 
 test:
 	lune run tests/run.luau
