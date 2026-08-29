@@ -3,10 +3,31 @@
   "Properties": {
     "Anchored": true,
     "BottomSurface": "Smooth",
-    "Color": [0.313725, 0.52549, 0.831373],
-    "CFrame": [42, 3.1, -7.8, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    "Color": [
+      0.313725,
+      0.52549,
+      0.831373
+    ],
+    "CFrame": [
+      12,
+      3.1,
+      -1.8,
+      1,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      1
+    ],
     "Material": "Neon",
-    "Size": [2, 0.18, 1.4],
+    "Size": [
+      2,
+      0.18,
+      1.4
+    ],
     "TopSurface": "Smooth"
   },
   "Children": [

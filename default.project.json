@@ -20,6 +20,10 @@
       }
     },
     "Workspace": {
+      "BobaSimCafe": {
+        "$className": "Folder",
+        "$path": "assets/world"
+      },
       "BobaSimStations": {
         "$className": "Folder",
         "$path": "assets/stations"

@@ -27,6 +27,8 @@ assertEqual(order.status, "Queued", "original order stays immutable")
 
 local machineByStep: { [string]: string } = {}
 for _, machine in Machines do
+    assertEqual(machine.modelName ~= "", true, `machine {machine.id} has modelName`)
+    assertEqual(machine.interactionRange > 0, true, `machine {machine.id} has interaction range`)
     machineByStep[machine.stationStep] = machine.modelName
 end
 
