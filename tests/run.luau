@@ -4,6 +4,7 @@ local OrderService = require("../src/server/OrderService")
 local CafeSession = require("../src/shared/CafeSession")
 local DrinkRules = require("../src/shared/DrinkRules")
 local Machines = require("../src/shared/Machines")
+local PhysicalInteractions = require("../src/shared/PhysicalInteractions")
 local Recipes = require("../src/shared/Recipes")
 local Types = require("../src/shared/Types")
 
@@ -30,6 +31,13 @@ for _, machine in Machines do
     assertEqual(machine.modelName ~= "", true, `machine {machine.id} has modelName`)
     assertEqual(machine.interactionRange > 0, true, `machine {machine.id} has interaction range`)
     machineByStep[machine.stationStep] = machine.modelName
+    assertEqual(machine.promptHint ~= "", true, `machine {machine.id} has a prompt hint`)
+    assertEqual(machine.checklistLabel ~= "", true, `machine {machine.id} has a checklist label`)
+    assertEqual(
+        machine.notReadyReason ~= "",
+        true,
+        `machine {machine.id} has a blocked-step reason`
+    )
 end
 
 for _, recipe in Recipes do
@@ -54,12 +62,12 @@ assertEqual(#drink.completedSteps, 0, "original drink stays immutable")
 
 local duplicateCup = DrinkRules.applyStep(cupStep.drink, "Cup")
 assertEqual(duplicateCup.accepted, false, "duplicate cup rejected")
-assertEqual(duplicateCup.reason, "expected Boba, got Cup", "duplicate cup reason")
+assertEqual(duplicateCup.reason, "Cup is already done", "duplicate cup reason")
 
 local earlyServe = DrinkRules.serveDrink(cupStep.drink)
 assertEqual(earlyServe.accepted, false, "early serve rejected")
 assertEqual(earlyServe.payout, 0, "early serve payout")
-assertEqual(earlyServe.drink.status, "Rejected", "early serve rejected status")
+assertEqual(earlyServe.drink.status, "Building", "early serve keeps drink in progress")
 
 local function applyAcceptedStep(
     currentDrink: Types.Drink,
@@ -73,9 +81,9 @@ local function applyAcceptedStep(
 end
 
 local currentDrink = cupStep.drink
+currentDrink = applyAcceptedStep(currentDrink, "Milk", "milk has no failure reason")
 currentDrink = applyAcceptedStep(currentDrink, "Boba", "boba has no failure reason")
 currentDrink = applyAcceptedStep(currentDrink, "Tea", "tea has no failure reason")
-currentDrink = applyAcceptedStep(currentDrink, "Milk", "milk has no failure reason")
 currentDrink = applyAcceptedStep(currentDrink, "Ice", "ice has no failure reason")
 currentDrink = applyAcceptedStep(currentDrink, "Shake", "shake has no failure reason")
 currentDrink = applyAcceptedStep(currentDrink, "Seal", "seal has no failure reason")
@@ -127,8 +135,19 @@ assertEqual(firstSnapshot.nextStep, "Cup", "session starts at cup")
 
 local badSessionStep = CafeSession.applyStep(session, "Tea", 101)
 assertEqual(badSessionStep.accepted, false, "session rejects wrong first station")
+assertEqual(badSessionStep.reason, "start with a cup", "wrong first station reason")
 assertEqual(badSessionStep.snapshot.nextStep, "Cup", "wrong station keeps next step")
 assertEqual(badSessionStep.snapshot.money, 0, "wrong station does not pay")
+
+local function holdSessionItem(itemId: Types.CarryItemId, displayName: string)
+    local snapshot = CafeSession.holdItem(session, itemId, displayName)
+    assertEqual(snapshot.heldItemName, displayName, `holding {displayName}`)
+end
+
+local function placeSessionItem()
+    local snapshot = CafeSession.placeHeldItem(session)
+    assertEqual(snapshot.heldItemId, nil, "placing clears the held item")
+end
 
 local function applySessionStep(step: Types.StationStep)
     local result = CafeSession.applyStep(session, step, 102)
@@ -137,11 +156,49 @@ local function applySessionStep(step: Types.StationStep)
 end
 
 applySessionStep("Cup")
+local availableAfterCup = CafeSession.snapshot(session).availableSteps
+assertEqual(#availableAfterCup, 4, "all classic ingredients are ready after taking a cup")
+local milkBeforeBoba = CafeSession.applyStep(session, "Milk", 101)
+assertEqual(milkBeforeBoba.accepted, false, "milk still needs its carton")
+assertEqual(milkBeforeBoba.reason, "pick up milk carton first", "milk carry requirement")
+local missingBobaScoop = CafeSession.applyStep(session, "Boba", 101)
+assertEqual(missingBobaScoop.accepted, false, "session requires boba scoop")
+assertEqual(missingBobaScoop.reason, "pick up boba scoop first", "missing boba scoop reason")
+holdSessionItem("boba_scoop", "Boba Scoop")
+local blockedReplacement = CafeSession.holdItem(session, "tea_kettle", "Tea Kettle")
+assertEqual(
+    blockedReplacement.heldItemId,
+    "boba_scoop",
+    "holding another item cannot replace boba scoop"
+)
+assertEqual(
+    blockedReplacement.heldItemName,
+    "Boba Scoop",
+    "holding another item keeps the current display name"
+)
+local placedBobaScoop = CafeSession.placeHeldItem(session)
+assertEqual(placedBobaScoop.heldItemName, nil, "placing clears held boba scoop")
+local missingBobaScoopAfterPlace = CafeSession.applyStep(session, "Boba", 101)
+assertEqual(
+    missingBobaScoopAfterPlace.reason,
+    "pick up boba scoop first",
+    "placed item no longer satisfies step"
+)
+holdSessionItem("boba_scoop", "Boba Scoop")
 applySessionStep("Boba")
+placeSessionItem()
+holdSessionItem("tea_kettle", "Tea Kettle")
 applySessionStep("Tea")
+placeSessionItem()
+holdSessionItem("milk_carton", "Milk Carton")
 applySessionStep("Milk")
+placeSessionItem()
+holdSessionItem("ice_scoop", "Ice Scoop")
 applySessionStep("Ice")
+placeSessionItem()
+holdSessionItem("shaker_tin", "Shaker Tin")
 applySessionStep("Shake")
+placeSessionItem()
 applySessionStep("Seal")
 local servedSnapshot = applySessionStep("Serve")
 
@@ -152,5 +209,22 @@ local newOrderSnapshot = applySessionStep("Cup")
 assertEqual(newOrderSnapshot.recipeName, "Strawberry Milk Tea", "served session advances recipe")
 assertEqual(newOrderSnapshot.nextStep, "Boba", "new recipe has advanced after cup")
 assertEqual(newOrderSnapshot.money, 8, "new order keeps earned money")
+
+local milkRule = PhysicalInteractions.getRule("Milk")
+assertEqual(milkRule.requiredCarryItemId, "milk_carton", "milk rule requires carton")
+assertEqual(
+    PhysicalInteractions.getRule("Cup").producedCarryItemId,
+    "cup",
+    "cup station produces its configured carryable"
+)
+assertEqual(
+    PhysicalInteractions.getRule("Serve").stepBehavior.kind,
+    "Serve",
+    "serve behavior comes from machine config"
+)
+assertEqual(Types.isStationStep("Milk"), true, "known station step is valid")
+assertEqual(Types.isStationStep("Bogus"), false, "unknown station step is invalid")
+assertEqual(Types.isCarryItemId("milk_carton"), true, "known carry item id is valid")
+assertEqual(Types.isCarryItemId("milk"), false, "unknown carry item id is invalid")
 
 print("All tests passed.")

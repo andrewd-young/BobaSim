@@ -27,6 +27,10 @@
       "BobaSimStations": {
         "$className": "Folder",
         "$path": "assets/stations"
+      },
+      "BobaSimCarryItems": {
+        "$className": "Folder",
+        "$path": "assets/carryables"
       }
     }
   }

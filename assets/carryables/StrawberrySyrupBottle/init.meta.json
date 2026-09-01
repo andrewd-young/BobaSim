@@ -2,14 +2,14 @@
   "className": "Model",
   "properties": {
     "Attributes": {
+      "CarryItemId": {
+        "String": "strawberry_syrup_bottle"
+      },
       "DisplayName": {
-        "String": "Flavor Pump Spot"
+        "String": "Strawberry Syrup"
       },
       "InteractionRange": {
-        "Float64": 8
-      },
-      "StationStep": {
-        "String": "Flavor"
+        "Float64": 7
       }
     }
   }

@@ -2,14 +2,14 @@
   "className": "Model",
   "properties": {
     "Attributes": {
+      "CarryItemId": {
+        "String": "milk_carton"
+      },
       "DisplayName": {
-        "String": "Flavor Pump Spot"
+        "String": "Milk Carton"
       },
       "InteractionRange": {
-        "Float64": 8
-      },
-      "StationStep": {
-        "String": "Flavor"
+        "Float64": 7
       }
     }
   }

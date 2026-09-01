@@ -1,0 +1,28 @@
+{
+  "ClassName": "Part",
+  "Properties": {
+    "Anchored": true,
+    "BottomSurface": "Smooth",
+    "Color": [0.898039, 0.215686, 0.337255],
+    "CFrame": [-0.8, 3.12, -0.15, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    "Material": "SmoothPlastic",
+    "Size": [0.5, 0.95, 0.5],
+    "TopSurface": "Smooth"
+  },
+  "Children": [
+    {
+      "Name": "CarryPrompt",
+      "ClassName": "ProximityPrompt",
+      "Properties": {
+        "ActionText": "Pick Up",
+        "ClickablePrompt": true,
+        "GamepadKeyCode": "ButtonX",
+        "HoldDuration": 0,
+        "KeyboardKeyCode": "E",
+        "MaxActivationDistance": 7,
+        "ObjectText": "Strawberry Syrup",
+        "RequiresLineOfSight": false
+      }
+    }
+  ]
+}

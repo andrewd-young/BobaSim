@@ -21,7 +21,9 @@ Success means a new player can join, make a correct starter drink, serve it, ear
 - [x] Rojo project is set up.
 - [x] StyLua, Selene, Luau LSP, Lune, and build commands are configured.
 - [x] `make check` runs formatting, linting, typechecking, tests, and Rojo build.
+- [x] `make lint` rejects explicit `any` in authored `src` and `tests` Luau.
 - [x] Initial shared recipe and machine config modules exist.
+- [x] Carryables and station progression use typed behavior/config variants rather than item- or step-specific implementation branches.
 - [x] Initial order service and pure Luau test exist.
 - [ ] Roblox Studio opens the built place successfully.
 - [ ] Rojo sync works from filesystem changes into Studio.
@@ -41,6 +43,8 @@ Success means a new player can join, make a correct starter drink, serve it, ear
 - [x] Add a basic rejection or remake result for an incorrect drink.
 - [x] Create minimal client feedback for each successful action. Initial HUD station loop flashes accepted steps and updates order progress.
 - [x] Create minimal client feedback for invalid actions. Initial HUD station loop flashes rejected steps and shows the server rejection reason.
+- [x] Add physical carry and placement for the starter tools and cup. World sources are config-driven: reusable tools reposition an existing model, while disposable cups clone a configured station part.
+- [x] Keep client presentation, server placement, station requirements, output items, labels, and progression roles synchronized through shared typed config.
 - [ ] Playtest one complete order in Studio.
 
 ## Phase 2: Customer Pressure
@@ -100,6 +104,9 @@ Success means a new player can join, make a correct starter drink, serve it, ear
 - Initial pressure system: customer patience and a short rush.
 - First upgrade should physically change workflow or bottleneck behavior.
 - Recipes and machines stay in shared config modules.
+- Carryables use a typed `WorldSource` union; adding an item that uses an existing source behavior should require config and assets, not new placement functions.
+- Machine config owns carry requirements, generated items, player-facing labels, and progression roles; shared rules adapt that config for gameplay and UI.
+- Authored gameplay code forbids explicit `any`; untrusted boundaries accept `unknown` and validate before narrowing.
 
 ## Layout Review Notes
 

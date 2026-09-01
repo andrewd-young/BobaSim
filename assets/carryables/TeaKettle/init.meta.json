@@ -2,14 +2,14 @@
   "className": "Model",
   "properties": {
     "Attributes": {
+      "CarryItemId": {
+        "String": "tea_kettle"
+      },
       "DisplayName": {
-        "String": "Flavor Pump Spot"
+        "String": "Tea Kettle"
       },
       "InteractionRange": {
-        "Float64": 8
-      },
-      "StationStep": {
-        "String": "Flavor"
+        "Float64": 7
       }
     }
   }

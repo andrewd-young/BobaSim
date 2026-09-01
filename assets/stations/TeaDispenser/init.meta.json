@@ -3,7 +3,7 @@
   "properties": {
     "Attributes": {
       "DisplayName": {
-        "String": "Tea Dispenser"
+        "String": "Tea Pour Spot"
       },
       "InteractionRange": {
         "Float64": 8

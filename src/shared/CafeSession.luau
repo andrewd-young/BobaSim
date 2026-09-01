@@ -1,6 +1,7 @@
 --!strict
 
 local DrinkRules = require("./DrinkRules")
+local PhysicalInteractions = require("./PhysicalInteractions")
 local Recipes = require("./Recipes")
 local Types = require("./Types")
 
@@ -17,6 +18,8 @@ type Order = {
 export type CafeSession = {
     activeOrder: Order,
     activeDrink: Types.Drink,
+    heldItemId: Types.CarryItemId?,
+    heldItemName: string?,
     money: number,
     servedDrinks: number,
     lastMessage: string,
@@ -30,7 +33,10 @@ export type Snapshot = {
     status: Types.DrinkStatus,
     completedSteps: { Types.StationStep },
     requiredSteps: { Types.StationStep },
+    availableSteps: { Types.StationStep },
     nextStep: Types.StationStep?,
+    heldItemId: Types.CarryItemId?,
+    heldItemName: string?,
     lastMessage: string,
 }
 
@@ -91,6 +97,8 @@ function CafeSession.create(now: number?): CafeSession
     return {
         activeOrder = order,
         activeDrink = drink,
+        heldItemId = nil,
+        heldItemName = nil,
         money = 0,
         servedDrinks = 0,
         lastMessage = "Make the order.",
@@ -99,8 +107,8 @@ end
 
 function CafeSession.snapshot(session: CafeSession): Snapshot
     local recipe = findRecipe(session.activeOrder.recipeId)
-    local nextStep: Types.StationStep? =
-        recipe.steps[#session.activeDrink.completedSteps + 1] :: any
+    local availableSteps = DrinkRules.getAvailableSteps(session.activeDrink)
+    local nextStep: Types.StationStep? = availableSteps[1]
 
     return {
         orderId = session.activeOrder.id,
@@ -110,9 +118,44 @@ function CafeSession.snapshot(session: CafeSession): Snapshot
         status = session.activeDrink.status,
         completedSteps = copySteps(session.activeDrink.completedSteps),
         requiredSteps = copySteps(recipe.steps),
+        availableSteps = availableSteps,
         nextStep = nextStep,
+        heldItemId = session.heldItemId,
+        heldItemName = session.heldItemName,
         lastMessage = session.lastMessage,
     }
+end
+
+function CafeSession.holdItem(
+    session: CafeSession,
+    itemId: Types.CarryItemId,
+    displayName: string
+): Snapshot
+    if session.heldItemId ~= nil then
+        session.lastMessage =
+            `Place {session.heldItemName or "the item"} before picking up another one.`
+        return CafeSession.snapshot(session)
+    end
+
+    session.heldItemId = itemId
+    session.heldItemName = displayName
+    session.lastMessage = `Holding {displayName}.`
+
+    return CafeSession.snapshot(session)
+end
+
+function CafeSession.placeHeldItem(session: CafeSession): Snapshot
+    if session.heldItemName == nil then
+        session.lastMessage = "Your hands are already empty."
+        return CafeSession.snapshot(session)
+    end
+
+    local placedItemName = session.heldItemName
+    session.heldItemId = nil
+    session.heldItemName = nil
+    session.lastMessage = `Placed {placedItemName}.`
+
+    return CafeSession.snapshot(session)
 end
 
 function CafeSession.applyStep(
@@ -132,7 +175,29 @@ function CafeSession.applyStep(
         session.activeOrder.status = "InProgress"
     end
 
-    if step == "Serve" then
+    local availableSteps = DrinkRules.getAvailableSteps(session.activeDrink)
+    local isAvailable = false
+    for _, availableStep in availableSteps do
+        if availableStep == step then
+            isAvailable = true
+            break
+        end
+    end
+
+    if isAvailable then
+        local canUseStep, carryReason = PhysicalInteractions.canUseStep(step, session.heldItemId)
+        if not canUseStep then
+            session.lastMessage = carryReason or PhysicalInteractions.getRule(step).promptHint
+
+            return {
+                accepted = false,
+                snapshot = CafeSession.snapshot(session),
+                reason = carryReason,
+            }
+        end
+    end
+
+    if PhysicalInteractions.getRule(step).stepBehavior.kind == "Serve" then
         local serveResult = DrinkRules.serveDrink(session.activeDrink)
         session.activeDrink = serveResult.drink
 

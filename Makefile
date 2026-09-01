@@ -1,4 +1,4 @@
-.PHONY: fmt lint sourcemap typecheck test build check dev
+.PHONY: fmt lint no-any sourcemap typecheck test build check dev
 
 fmt:
 	stylua src tests
@@ -6,6 +6,10 @@ fmt:
 lint:
 	stylua --check src tests
 	selene src tests
+	$(MAKE) no-any
+
+no-any:
+	./scripts/check-no-any.sh
 
 sourcemap:
 	rojo sourcemap default.project.json --output sourcemap.json

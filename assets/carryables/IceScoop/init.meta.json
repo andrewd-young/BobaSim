@@ -2,14 +2,14 @@
   "className": "Model",
   "properties": {
     "Attributes": {
+      "CarryItemId": {
+        "String": "ice_scoop"
+      },
       "DisplayName": {
-        "String": "Flavor Pump Spot"
+        "String": "Ice Scoop"
       },
       "InteractionRange": {
-        "Float64": 8
-      },
-      "StationStep": {
-        "String": "Flavor"
+        "Float64": 7
       }
     }
   }

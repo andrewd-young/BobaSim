@@ -1,0 +1,29 @@
+{
+  "ClassName": "Part",
+  "Properties": {
+    "Anchored": true,
+    "BottomSurface": "Smooth",
+    "Color": [0.152941, 0.384314, 0.498039],
+    "CFrame": [-3.9, 3.1, -0.25, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+    "Material": "Metal",
+    "Shape": "Ball",
+    "Size": [1.1, 0.85, 1.1],
+    "TopSurface": "Smooth"
+  },
+  "Children": [
+    {
+      "Name": "CarryPrompt",
+      "ClassName": "ProximityPrompt",
+      "Properties": {
+        "ActionText": "Pick Up",
+        "ClickablePrompt": true,
+        "GamepadKeyCode": "ButtonX",
+        "HoldDuration": 0,
+        "KeyboardKeyCode": "E",
+        "MaxActivationDistance": 7,
+        "ObjectText": "Tea Kettle",
+        "RequiresLineOfSight": false
+      }
+    }
+  ]
+}

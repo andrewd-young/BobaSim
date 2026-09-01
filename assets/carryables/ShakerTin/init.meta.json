@@ -2,14 +2,14 @@
   "className": "Model",
   "properties": {
     "Attributes": {
+      "CarryItemId": {
+        "String": "shaker_tin"
+      },
       "DisplayName": {
-        "String": "Flavor Pump Spot"
+        "String": "Shaker Tin"
       },
       "InteractionRange": {
-        "Float64": 8
-      },
-      "StationStep": {
-        "String": "Flavor"
+        "Float64": 7
       }
     }
   }

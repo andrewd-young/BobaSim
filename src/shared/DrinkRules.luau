@@ -1,7 +1,8 @@
 --!strict
 
 local Types = require("./Types")
-local Recipes = require("./Recipes")
+local Machines: { Types.MachineDefinition } = require("./Machines")
+local Recipes: { Types.RecipeDefinition } = require("./Recipes")
 
 type StationStep = Types.StationStep
 type RecipeDefinition = Types.RecipeDefinition
@@ -24,10 +25,6 @@ local function findRecipe(recipeId: string): RecipeDefinition?
     end
 
     return nil
-end
-
-local function expectedStep(drink: Drink, recipe: RecipeDefinition): StationStep?
-    return recipe.steps[#drink.completedSteps + 1]
 end
 
 local function cloneDrinkWithStep(drink: Drink, step: StationStep, status: DrinkStatus): Drink
@@ -67,6 +64,101 @@ function DrinkRules.createDrink(orderId: string, recipeId: string): Drink
     }
 end
 
+local function hasCompletedStep(drink: Drink, step: string): boolean
+    for _, completedStep in drink.completedSteps do
+        if completedStep == step then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function recipeIncludesStep(recipe: RecipeDefinition, step: StationStep): boolean
+    for _, recipeStep in recipe.steps do
+        if recipeStep == step then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function findMachine(step: StationStep): Types.MachineDefinition?
+    for _, machine in Machines do
+        if machine.stationStep == step then
+            return machine
+        end
+    end
+
+    return nil
+end
+
+type ProgressionKind = "Start" | "Ingredient" | "Process" | "Finalize" | "Serve"
+
+local progressionKinds: { ProgressionKind } =
+    { "Start", "Ingredient", "Process", "Finalize", "Serve" }
+
+local function getIncompleteStepsOfKind(
+    drink: Drink,
+    recipe: RecipeDefinition,
+    kind: ProgressionKind
+): { StationStep }
+    local steps: { StationStep } = {}
+    for index = 1, #recipe.steps do
+        local step: StationStep = recipe.steps[index]
+        local machine = findMachine(step)
+        if
+            machine ~= nil
+            and machine.stepBehavior.kind == kind
+            and not hasCompletedStep(drink, step)
+        then
+            table.insert(steps, step)
+        end
+    end
+    return steps
+end
+
+function DrinkRules.getAvailableSteps(drink: Drink): { StationStep }
+    if drink.status == "Served" or drink.status == "Rejected" then
+        return {}
+    end
+
+    local recipe = findRecipe(drink.recipeId)
+    if recipe == nil then
+        return {}
+    end
+
+    for index = 1, #progressionKinds do
+        local kind: ProgressionKind = progressionKinds[index]
+        local incompleteSteps = getIncompleteStepsOfKind(drink, recipe, kind)
+        if #incompleteSteps > 0 then
+            return incompleteSteps
+        end
+    end
+
+    return {}
+end
+
+local function unavailableReason(drink: Drink, recipe: RecipeDefinition, step: StationStep): string
+    if not recipeIncludesStep(recipe, step) then
+        return `{step} is not needed for this order`
+    end
+
+    if hasCompletedStep(drink, step) then
+        return `{step} is already done`
+    end
+
+    local missingStartSteps = getIncompleteStepsOfKind(drink, recipe, "Start")
+    local blockingStep: StationStep = if #missingStartSteps > 0
+        then missingStartSteps[1] :: StationStep
+        else step
+    local blockingMachine = findMachine(blockingStep)
+    return if blockingMachine ~= nil
+        then blockingMachine.notReadyReason
+        else `finish the drink before using {step}`
+end
+
 function DrinkRules.applyStep(drink: Drink, step: StationStep): StepApplication
     if drink.status ~= "Building" then
         return {
@@ -76,7 +168,8 @@ function DrinkRules.applyStep(drink: Drink, step: StationStep): StepApplication
         }
     end
 
-    if step == "Serve" then
+    local machine = findMachine(step)
+    if machine ~= nil and machine.stepBehavior.kind == "Serve" then
         return {
             accepted = false,
             drink = drink,
@@ -93,16 +186,27 @@ function DrinkRules.applyStep(drink: Drink, step: StationStep): StepApplication
         }
     end
 
-    local nextStep = expectedStep(drink, recipe)
-    if nextStep ~= step then
+    local availableSteps = DrinkRules.getAvailableSteps(drink)
+    local isAvailable = false
+    for _, availableStep in availableSteps do
+        if availableStep == step then
+            isAvailable = true
+            break
+        end
+    end
+
+    if not isAvailable then
         return {
             accepted = false,
             drink = drink,
-            reason = `expected {tostring(nextStep)}, got {step}`,
+            reason = unavailableReason(drink, recipe, step),
         }
     end
 
-    local status: DrinkStatus = if step == "Seal" then "Sealed" else "Building"
+    local status: DrinkStatus = if machine ~= nil
+            and machine.stepBehavior.kind == "Finalize"
+        then machine.stepBehavior.completedDrinkStatus
+        else "Building"
 
     return {
         accepted = true,
@@ -122,11 +226,12 @@ function DrinkRules.serveDrink(drink: Drink): ServeResult
         }
     end
 
-    local nextStep = expectedStep(drink, recipe)
-    if nextStep ~= "Serve" or drink.status ~= "Sealed" then
+    local availableSteps = DrinkRules.getAvailableSteps(drink)
+    local nextMachine = if availableSteps[1] ~= nil then findMachine(availableSteps[1]) else nil
+    if nextMachine == nil or nextMachine.stepBehavior.kind ~= "Serve" then
         return {
             accepted = false,
-            drink = cloneDrinkWithStatus(drink, "Rejected"),
+            drink = drink,
             payout = 0,
             reason = "drink is not ready to serve",
         }

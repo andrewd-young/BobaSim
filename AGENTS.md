@@ -37,6 +37,40 @@ restaurant management.
 9. Build Studio models around stable names, attributes, and interaction points.
 10. If Studio behavior, instances, physics, animation, or UI changed, verify it in Studio.
 
+## Extensible Design Requirements
+
+Agents must solve the underlying pattern, not patch the single example discovered in
+testing. When a request exposes an item-, recipe-, station-, or UI-specific branch,
+inspect the whole affected flow (shared config, server authority, client presentation,
+world assets, and tests) before changing code. Apply the resulting abstraction to all
+existing variants in scope.
+
+1. Model known variations as typed data, preferably a discriminated union with a
+   `kind` field. Data chooses a behavior; it must not require a growing set of
+   `if itemId == ...` or `if step == ...` branches across services/controllers.
+2. Add a new union variant only for a genuinely new mechanic. Examples include an
+   inventory-limited spawn or attaching an item to a machine; a different cup,
+   syrup, tray, lid, or receipt should normally be another config entry.
+3. Keep each behavior implementation generic and focused. Use modules/services as
+   the object boundary: they own one responsibility and dispatch from typed config.
+   Do not introduce classes merely for style; use object-oriented boundaries where
+   they improve ownership, state isolation, or polymorphic behavior.
+4. Centralize gameplay rules and player-facing labels with the domain definition
+   that owns them. Do not duplicate item names, placement sources, prompts, step
+   requirements, progression roles, offsets, or output rules in server/client code.
+5. Treat a new content entry as a no-code-change test. After adding the generic
+   mechanism, ask whether a future entry using an existing behavior variant can be
+   added by configuration and assets alone. If not, identify and remove the leaked
+   special case before considering the work complete.
+6. Add or update contract tests for config completeness and behavior dispatch, not
+   only a regression test for the one reported item. Verify every existing config
+   entry satisfies the new contract.
+7. In the final handoff, call out the abstraction added, the variants it covers,
+   and any remaining hardcoded rule that is intentionally deferred to a follow-up.
+8. Explicit `any` is forbidden in authored `src` and `tests` Luau. Use a concrete
+   type or a discriminated union; at untrusted boundaries, accept `unknown` and
+   validate it before narrowing. `make lint` enforces this rule.
+
 ## Commands
 
 - `make fmt`: format Luau files.

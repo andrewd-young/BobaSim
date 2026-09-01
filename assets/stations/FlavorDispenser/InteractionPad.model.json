@@ -9,9 +9,9 @@
       0.384314
     ],
     "CFrame": [
-      9,
-      3.1,
-      -10.8,
+      -0.7,
+      2.95,
+      -1.5,
       1,
       0,
       0,
@@ -24,9 +24,9 @@
     ],
     "Material": "Neon",
     "Size": [
-      2,
-      0.18,
-      1.4
+      1.35,
+      0.12,
+      1.05
     ],
     "TopSurface": "Smooth"
   },
@@ -41,7 +41,7 @@
         "HoldDuration": 0,
         "KeyboardKeyCode": "E",
         "MaxActivationDistance": 8,
-        "ObjectText": "Flavor Dispenser",
+        "ObjectText": "Prep Counter",
         "RequiresLineOfSight": false
       }
     }
